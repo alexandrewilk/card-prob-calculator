@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Probability Calculator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .form-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ff3030;
+            box-shadow: 0 0 0 3px rgba(255, 48, 48, 0.15);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #ff3030 0%, #ff6b35 50%, #ffd700 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 48, 48, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            text-align: center;
+            margin-top: 2rem;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .probability-display {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff3030 0%, #ff6b35 50%, #ffd700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.5s ease;
+        }
+
+        .probability-display.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .probability-label {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.8;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease 0.2s;
+        }
+
+        .probability-label.show {
+            opacity: 0.8;
+            transform: translateY(0);
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .error.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .form-container {
+                padding: 1.5rem;
+            }
+            
+            .probability-display {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Card Probability</h1>
+            <p class="subtitle">Calculate your odds of drawing the right cards</p>
+        </div>
+
+        <div class="form-container">
+            <div class="input-group">
+                <label for="deckSize">Total cards in deck</label>
+                <input type="number" id="deckSize" placeholder="e.g., 60" min="1">
+            </div>
+
+            <div class="input-group">
+                <label for="targetCards">Copies of target card in deck</label>
+                <input type="number" id="targetCards" placeholder="e.g., 4" min="0">
+            </div>
+
+            <div class="input-group">
+                <label for="cardsDraw">Cards you will draw</label>
+                <input type="number" id="cardsDraw" placeholder="e.g., 7" min="1">
+            </div>
+
+            <button class="calculate-btn" onclick="calculateProbability()">
+                Calculate Probability
+            </button>
+            
+            <div class="error" id="error"></div>
+        </div>
+    </div>
+
+    <div class="result-container">
+        <div class="probability-display" id="probabilityDisplay">0%</div>
+        <div class="probability-label" id="probabilityLabel">Probability of drawing at least 1 target card</div>
+    </div>
+
+    <script>
+        function factorial(n) {
+            if (n <= 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        function combination(n, r) {
+            if (r > n || r < 0) return 0;
+            if (r === 0 || r === n) return 1;
+            
+            // Use the more efficient formula: C(n,r) = n! / (r! * (n-r)!)
+            // But calculate it iteratively to avoid large factorials
+            let result = 1;
+            for (let i = 0; i < r; i++) {
+                result = result * (n - i) / (i + 1);
+            }
+            return Math.round(result);
+        }
+
+        function hypergeometricProbability(populationSize, successStates, sampleSize, observedSuccesses) {
+            const numerator = combination(successStates, observedSuccesses) * 
+                            combination(populationSize - successStates, sampleSize - observedSuccesses);
+            const denominator = combination(populationSize, sampleSize);
+            
+            return numerator / denominator;
+        }
+
+        function animateNumber(element, targetValue) {
+            const duration = 1500; // 1.5 seconds
+            const startTime = performance.now();
+            const startValue = 0;
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function: starts fast, slows down (cubic-out)
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (targetValue - startValue) * easeOut;
+                
+                element.textContent = currentValue.toFixed(1) + '%';
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        function calculateProbability() {
+            const deckSize = parseInt(document.getElementById('deckSize').value);
+            const targetCards = parseInt(document.getElementById('targetCards').value);
+            const cardsDraw = parseInt(document.getElementById('cardsDraw').value);
+            const errorElement = document.getElementById('error');
+            const probabilityDisplay = document.getElementById('probabilityDisplay');
+            const probabilityLabel = document.getElementById('probabilityLabel');
+
+            // Clear previous error
+            errorElement.classList.remove('show');
+            errorElement.textContent = '';
+
+            // Validation
+            if (isNaN(deckSize) || isNaN(targetCards) || isNaN(cardsDraw)) {
+                errorElement.textContent = 'Please fill in all fields with valid numbers.';
+                errorElement.classList.add('show');
+                return;
+            }
+
+            if (deckSize <= 0 || targetCards < 0 || cardsDraw <= 0) {
+                errorElement.textContent = 'Please enter positive numbers for deck size and cards to draw.';
+                errorElement.classList.add('show');
+                return;
+            }
+
+            if (targetCards > deckSize) {
+                errorElement.textContent = 'Target cards cannot exceed total deck size.';
+                errorElement.classList.add('show');
+                return;
+            }
+
+            if (cardsDraw > deckSize) {
+                errorElement.textContent = 'Cards to draw cannot exceed total deck size.';
+                errorElement.classList.add('show');
+                return;
+            }
+
+            // Calculate probability of drawing at least 1 target card
+            // P(at least 1) = 1 - P(exactly 0)
+            const probExactly0 = hypergeometricProbability(deckSize, targetCards, cardsDraw, 0);
+            const probAtLeast1 = 1 - probExactly0;
+            const percentageAtLeast1 = probAtLeast1 * 100;
+
+            // Show result with animation
+            probabilityDisplay.classList.remove('show');
+            probabilityLabel.classList.remove('show');
+            
+            setTimeout(() => {
+                probabilityDisplay.classList.add('show');
+                probabilityLabel.classList.add('show');
+                animateNumber(probabilityDisplay, percentageAtLeast1);
+            }, 100);
+        }
+
+        // Allow Enter key to calculate
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateProbability();
+            }
+        });
+    </script>
+</body>
+</html>
